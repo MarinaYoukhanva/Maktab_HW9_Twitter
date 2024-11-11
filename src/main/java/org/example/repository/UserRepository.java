@@ -7,11 +7,11 @@ import java.sql.SQLException;
 public interface UserRepository {
 
     void initTable() throws SQLException;
-    User save(User user);
-    User update(User user);
-    void deleteById(int id);
-    User findById(int id);
-    User findByUsername(String username);
+    User save(User user) throws SQLException;
+    User update(User user) throws SQLException;
+    void deleteById(int id) throws SQLException;
+    User findById(int id) throws SQLException;
+    User findByUsername(String username) throws SQLException;
 
 
 }

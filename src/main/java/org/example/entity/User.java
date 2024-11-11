@@ -1,7 +1,12 @@
 package org.example.entity;
 
-import java.time.LocalDateTime;
+import lombok.*;
 
+import java.time.LocalDate;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
     private int id;
@@ -10,7 +15,7 @@ public class User {
     private String username;
     private String password;
     private String bio;
-    private LocalDateTime accountCreationDate;
+    private LocalDate accountCreationDate;
 
 
 }
