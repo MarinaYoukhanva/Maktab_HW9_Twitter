@@ -19,7 +19,7 @@ public class UserRepositoryImpl implements UserRepository {
             CREATE TABLE IF NOT EXISTS "user"
             (
                 id SERIAL PRIMARY KEY,
-                display_name VARCHAR(50) UNIQUE NOT NULL ,
+                display_name VARCHAR(50) NOT NULL ,
                 email VARCHAR(50)  UNIQUE NOT NULL CHECK (email LIKE '%@gmail.com') ,
                 username VARCHAR(50) UNIQUE NOT NULL,
                 password VARCHAR(50) NOT NULL,
@@ -52,6 +52,11 @@ public class UserRepositoryImpl implements UserRepository {
     private static final String FIND_BY_USERNAME_SQL = """
             SELECT * FROM "user"
             WHERE username = ?
+            """;
+
+    private static final String FIND_BY_EMAIL_SQL = """
+            SELECT * FROM "user"
+            WHERE email = ?
             """;
 
     @Override
@@ -101,11 +106,18 @@ public class UserRepositoryImpl implements UserRepository {
             return user;
         }
     }
-
     @Override
     public User findByUsername(String username) throws SQLException {
-        try (var statement = Datasource.getConnection().prepareStatement(FIND_BY_USERNAME_SQL)) {
-            statement.setString(1, username);
+        return findUser(username, FIND_BY_USERNAME_SQL);
+    }
+    @Override
+    public User findByEmail (String email) throws SQLException {
+        return findUser(email, FIND_BY_EMAIL_SQL);
+    }
+
+    private User findUser(String columnName, String findSQL) throws SQLException {
+        try (var statement = Datasource.getConnection().prepareStatement(findSQL)) {
+            statement.setString(1, columnName);
             ResultSet resultSet = statement.executeQuery();
             User user = null;
             if (resultSet.next()) {

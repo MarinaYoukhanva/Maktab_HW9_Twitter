@@ -12,6 +12,7 @@ public interface UserRepository {
     void deleteById(int id) throws SQLException;
     User findById(int id) throws SQLException;
     User findByUsername(String username) throws SQLException;
+    User findByEmail(String email) throws SQLException;
 
 
 }
