@@ -7,8 +7,8 @@ import java.sql.SQLException;
 public interface TweetRepository {
 
     void initTable() throws SQLException;
-    Tweet save(Tweet tweet);
-    Tweet update(Tweet tweet);
-    void deleteById(int id);
-    Tweet findById(int id);
+    Tweet save(Tweet tweet) throws SQLException;
+    Tweet update(Tweet tweet) throws SQLException;
+    void deleteById(int id) throws SQLException;
+    Tweet findById(int id) throws SQLException;
 }

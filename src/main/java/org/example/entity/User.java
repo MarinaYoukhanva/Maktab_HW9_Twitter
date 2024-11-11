@@ -4,7 +4,8 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
@@ -17,5 +18,15 @@ public class User {
     private String bio;
     private LocalDate accountCreationDate;
 
-
+    @Override
+    public String toString() {
+        return "User {" +'\n' +
+                '\t' + " id : " + id +'\n' +
+                '\t' + " displayName : " + displayName + '\'' + '\n' +
+                '\t' + " email : " + email + '\'' +'\n' +
+                '\t' + " username : " + username + '\'' +'\n' +
+                '\t' + " bio : " + bio + '\'' +'\n' +
+                '\t' + " accountCreationDate : " + accountCreationDate +'\n' +
+                '}';
+    }
 }

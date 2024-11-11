@@ -2,11 +2,15 @@ package org.example.repository.impl;
 
 import org.example.Datasource;
 import org.example.entity.Tweet;
+import org.example.entity.User;
 import org.example.repository.TweetRepository;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class TweetRepositoryImpl implements TweetRepository {
+
+    UserRepositoryImpl userRepository = new UserRepositoryImpl() ;
 
     private static final String CREATE_TABLE = """
             CREATE TABLE IF NOT EXISTS tweet
@@ -20,6 +24,30 @@ public class TweetRepositoryImpl implements TweetRepository {
             )
             """;
 
+    private static final String INSERT_SQL = """
+            INSERT INTO tweet (text, user_id, retweet_from_id)
+            VALUES(?, ?, ?)
+            """;
+
+    private static final String UPDATE_SQL = """
+            UPDATE tweet
+            SET text = ?, likes = ?, dislikes = ?
+            WHERE id = ?
+            """;
+
+    private static final String DELETE_BY_ID_SQL = """
+            DELETE FROM tweet
+            WHERE id = ?
+            """;
+
+    private static final String FIND_BY_ID_SQL = """
+            SELECT * FROM tweet
+            WHERE id = ?
+            """;
+
+    public TweetRepositoryImpl() throws SQLException {
+    }
+
     @Override
     public void initTable() throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(CREATE_TABLE);
@@ -28,22 +56,58 @@ public class TweetRepositoryImpl implements TweetRepository {
     }
 
     @Override
-    public Tweet save(Tweet tweet) {
-        return null;
+    public Tweet save(Tweet tweet) throws SQLException {
+        try (var statement = Datasource.getConnection().prepareStatement(INSERT_SQL)) {
+            statement.setString(1, tweet.getText());
+            statement.setInt(2, tweet.getUser().getId());
+            statement.setInt(3, tweet.getRetweetFrom().getId());
+            statement.execute();
+            return tweet;
+        }
     }
 
     @Override
-    public Tweet update(Tweet tweet) {
-        return null;
+    public Tweet update(Tweet tweet) throws SQLException {
+        try (var statement = Datasource.getConnection().prepareStatement(UPDATE_SQL)) {
+            statement.setString(1, tweet.getText());
+            statement.setInt(2, tweet.getLikes());
+            statement.setInt(3, tweet.getDislikes());
+            statement.setInt(4, tweet.getId());
+            statement.execute();
+            return tweet;
+        }
     }
 
     @Override
-    public void deleteById(int id) {
-
+    public void deleteById(int id) throws SQLException {
+        try (var statement = Datasource.getConnection().prepareStatement(DELETE_BY_ID_SQL)) {
+            statement.setInt(1, id);
+            var affectedRows = statement.executeUpdate();
+            System.out.println("number of tweets deleted: " + affectedRows);
+        }
     }
 
     @Override
-    public Tweet findById(int id) {
-        return null;
+    public Tweet findById(int id) throws SQLException {
+        try (var statement = Datasource.getConnection().prepareStatement(FIND_BY_ID_SQL)) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            Tweet tweet = null;
+            if (resultSet.next()) {
+                int tweetId = resultSet.getInt(1);
+                String text = resultSet.getString(2);
+                int likes = resultSet.getInt(3);
+                int dislikes = resultSet.getInt(4);
+                int userId = resultSet.getInt(5);
+                int retweetFromId = resultSet.getInt(6);
+                User user =userRepository.findById(userId);
+                Tweet retweetFrom = null;
+                if(retweetFromId != 0){
+                    retweetFrom = findById(retweetFromId);
+                }
+                tweet = new Tweet(tweetId, text, likes, dislikes, user, retweetFrom);
+            }
+            return tweet;
+        }
     }
 }
