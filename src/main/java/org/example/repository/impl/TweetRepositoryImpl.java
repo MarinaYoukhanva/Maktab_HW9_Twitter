@@ -5,12 +5,15 @@ import org.example.entity.Tweet;
 import org.example.entity.User;
 import org.example.repository.TweetRepository;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TweetRepositoryImpl implements TweetRepository {
 
-    UserRepositoryImpl userRepository = new UserRepositoryImpl() ;
+    UserRepositoryImpl userRepository = new UserRepositoryImpl();
 
     private static final String CREATE_TABLE = """
             CREATE TABLE IF NOT EXISTS tweet
@@ -45,6 +48,12 @@ public class TweetRepositoryImpl implements TweetRepository {
             WHERE id = ?
             """;
 
+    private static final String FIND_BY_USER_SQL = """
+            SELECT * FROM tweet
+            WHERE user_id = ?
+            """;
+
+
     public TweetRepositoryImpl() throws SQLException {
     }
 
@@ -57,12 +66,20 @@ public class TweetRepositoryImpl implements TweetRepository {
 
     @Override
     public Tweet save(Tweet tweet) throws SQLException {
-        try (var statement = Datasource.getConnection().prepareStatement(INSERT_SQL)) {
+        try (var statement = Datasource.getConnection().prepareStatement(INSERT_SQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, tweet.getText());
             statement.setInt(2, tweet.getUser().getId());
-            statement.setInt(3, tweet.getRetweetFrom().getId());
+            if (tweet.getRetweetFrom() != null)
+                statement.setInt(3, tweet.getRetweetFrom().getId());
+            else statement.setNull(3, java.sql.Types.INTEGER);
             statement.execute();
-            return tweet;
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    tweet.setId(generatedKeys.getInt(1));
+                }
+                return tweet;
+            }
         }
     }
 
@@ -100,14 +117,37 @@ public class TweetRepositoryImpl implements TweetRepository {
                 int dislikes = resultSet.getInt(4);
                 int userId = resultSet.getInt(5);
                 int retweetFromId = resultSet.getInt(6);
-                User user =userRepository.findById(userId);
+                User user = userRepository.findById(userId);
                 Tweet retweetFrom = null;
-                if(retweetFromId != 0){
+                if (retweetFromId != 0) {
                     retweetFrom = findById(retweetFromId);
                 }
                 tweet = new Tweet(tweetId, text, likes, dislikes, user, retweetFrom);
             }
             return tweet;
+        }
+    }
+
+    @Override
+    public List<Tweet> findByUser(User user) throws SQLException {
+        try (var statement = Datasource.getConnection().prepareStatement(FIND_BY_USER_SQL)) {
+            statement.setInt(1, user.getId());
+            ResultSet resultSet = statement.executeQuery();
+            List<Tweet> tweets = new ArrayList<>();
+            while (resultSet.next()) {
+                int tweetId = resultSet.getInt(1);
+                String text = resultSet.getString(2);
+                int likes = resultSet.getInt(3);
+                int dislikes = resultSet.getInt(4);
+                int retweetFromId = resultSet.getInt(6);
+                Tweet retweetFrom = null;
+                if (retweetFromId != 0) {
+                    retweetFrom = findById(retweetFromId);
+                }
+                Tweet tweet = new Tweet(tweetId, text, likes, dislikes, user, retweetFrom);
+                tweets.add(tweet);
+            }
+            return tweets;
         }
     }
 }
