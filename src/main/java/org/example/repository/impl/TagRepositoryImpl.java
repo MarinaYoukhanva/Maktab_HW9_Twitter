@@ -3,12 +3,18 @@ package org.example.repository.impl;
 import org.example.Datasource;
 import org.example.entity.Tag;
 import org.example.repository.TagRepository;
+import org.example.repository.TweetTagRepository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class TagRepositoryImpl implements TagRepository {
+    TweetTagRepository tweetTagRepository;
 
+    public TagRepositoryImpl() throws SQLException {
+        tweetTagRepository = new TweetTagRepositoryImpl();
+        initTable();
+    }
     private static final String CREATE_TABLE = """
             CREATE TABLE IF NOT EXISTS tag
             (
@@ -36,6 +42,11 @@ public class TagRepositoryImpl implements TagRepository {
     private static final String FIND_BY_ID_SQL = """
             SELECT * FROM tag
             WHERE id = ?
+            """;
+
+    private static final String FIND_BY_TITLE_SQL = """
+            SELECT * FROM tag
+            WHERE title = ?
             """;
 
     @Override
@@ -81,8 +92,24 @@ public class TagRepositoryImpl implements TagRepository {
             Tag tag = null;
             if (resultSet.next()) {
                 int tagId = resultSet.getInt(1);
-                String title = resultSet.getString(2);
-                tag = new Tag(tagId, title);
+                String tagTitle = resultSet.getString(2);
+                tag = new Tag(tagId, tagTitle);
+            }
+            return tag;
+        }
+    }
+
+
+    @Override
+    public Tag findByTitle(String title) throws SQLException {
+        try (var statement = Datasource.getConnection().prepareStatement(FIND_BY_TITLE_SQL)) {
+            statement.setString(1, title);
+            ResultSet resultSet = statement.executeQuery();
+            Tag tag = null;
+            if (resultSet.next()) {
+                int tagId = resultSet.getInt(1);
+                String tagTitle = resultSet.getString(2);
+                tag = new Tag(tagId, tagTitle);
             }
             return tag;
         }

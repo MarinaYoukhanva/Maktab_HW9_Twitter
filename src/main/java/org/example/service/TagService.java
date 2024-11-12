@@ -1,4 +1,7 @@
 package org.example.service;
 
-public interface TagService {
+import java.sql.SQLException;
+
+public interface TagService{
+    void createTag(String title) throws SQLException;
 }

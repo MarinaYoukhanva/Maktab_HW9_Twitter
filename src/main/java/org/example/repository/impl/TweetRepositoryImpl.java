@@ -52,9 +52,14 @@ public class TweetRepositoryImpl implements TweetRepository {
             SELECT * FROM tweet
             WHERE user_id = ?
             """;
+    private static final String SHOW_TWEETS_SQL = """
+            SELECT * FROM tweet
+            ORDER BY id DESC
+            """;
 
 
     public TweetRepositoryImpl() throws SQLException {
+        initTable();
     }
 
     @Override
@@ -111,18 +116,7 @@ public class TweetRepositoryImpl implements TweetRepository {
             ResultSet resultSet = statement.executeQuery();
             Tweet tweet = null;
             if (resultSet.next()) {
-                int tweetId = resultSet.getInt(1);
-                String text = resultSet.getString(2);
-                int likes = resultSet.getInt(3);
-                int dislikes = resultSet.getInt(4);
-                int userId = resultSet.getInt(5);
-                int retweetFromId = resultSet.getInt(6);
-                User user = userRepository.findById(userId);
-                Tweet retweetFrom = null;
-                if (retweetFromId != 0) {
-                    retweetFrom = findById(retweetFromId);
-                }
-                tweet = new Tweet(tweetId, text, likes, dislikes, user, retweetFrom);
+                tweet = getTweetInfo (resultSet);
             }
             return tweet;
         }
@@ -149,5 +143,31 @@ public class TweetRepositoryImpl implements TweetRepository {
             }
             return tweets;
         }
+    }
+    @Override
+    public List<Tweet> findAll() throws SQLException {
+        try (var statement = Datasource.getConnection().prepareStatement(SHOW_TWEETS_SQL)) {
+            ResultSet resultSet = statement.executeQuery();
+            List<Tweet> tweets = new ArrayList<>();
+            while (resultSet.next()) {
+                Tweet tweet = getTweetInfo(resultSet);
+                tweets.add(tweet);
+            }
+            return tweets;
+        }
+    }
+    private Tweet getTweetInfo (ResultSet resultSet) throws SQLException {
+        int tweetId = resultSet.getInt(1);
+        String text = resultSet.getString(2);
+        int likes = resultSet.getInt(3);
+        int dislikes = resultSet.getInt(4);
+        int userId = resultSet.getInt(5);
+        int retweetFromId = resultSet.getInt(6);
+        User user = userRepository.findById(userId);
+        Tweet retweetFrom = null;
+        if (retweetFromId != 0) {
+            retweetFrom = findById(retweetFromId);
+        }
+        return new Tweet(tweetId, text, likes, dislikes, user, retweetFrom);
     }
 }

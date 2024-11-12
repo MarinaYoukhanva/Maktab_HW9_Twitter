@@ -13,6 +13,6 @@ public interface TweetRepository {
     Tweet update(Tweet tweet) throws SQLException;
     void deleteById(int id) throws SQLException;
     Tweet findById(int id) throws SQLException;
-
     List<Tweet> findByUser(User user) throws SQLException;
+    List<Tweet> findAll() throws SQLException;
 }

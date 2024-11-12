@@ -11,4 +11,6 @@ public interface TagRepository {
     Tag update(Tag tag) throws SQLException;
     void deleteById(int id) throws SQLException;
     Tag findById(int id) throws SQLException;
+
+    Tag findByTitle(String title) throws SQLException;
 }

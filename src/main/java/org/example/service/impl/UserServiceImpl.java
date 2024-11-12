@@ -34,10 +34,13 @@ public class UserServiceImpl implements UserService {
         User user = null;
         if (userRepository.findByUsername(username) == null) {
             if (userRepository.findByEmail(email) == null) {
-                String hashedPassword = hashPassword(password);
-                user = new User(0, displayName, email, username, hashedPassword, bio, null);
-                userRepository.save(user);
-                user = userRepository.findByUsername(username);
+                if (email.endsWith("@gmail.com")){
+                    String hashedPassword = hashPassword(password);
+                    user = new User(0, displayName, email, username, hashedPassword, bio, null);
+                    userRepository.save(user);
+                    user = userRepository.findByUsername(username);
+                }
+                else System.out.println("gmail format error! ");
             }
         }
         return user;
@@ -66,7 +69,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Tweet postTweet(User user, String text, Tweet retweetFrom) throws SQLException {
+    public Tweet postTweet(User user, String text, int retweetFromId) throws SQLException {
+        Tweet retweetFrom = tweetRepository.findById(retweetFromId);
         Tweet tweet = new Tweet(0,text, 0, 0, user, retweetFrom);
         return tweetRepository.save(tweet);
     }
@@ -77,8 +81,8 @@ public class UserServiceImpl implements UserService {
         if (!tweets.isEmpty()){
             for (Tweet tweet : tweets) {
                 System.out.println(tweet);
-                return true;
             }
+            return true;
         }
         return false;
     }
@@ -95,14 +99,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void editTweet() throws SQLException {
-
+    public boolean editTweet(User user, int tweetId, String newText) throws SQLException {
+        List<Tweet> tweets = tweetRepository.findByUser(user);
+        Tweet tweet = tweetRepository.findById(tweetId);
+        if (tweets.contains(tweet)) {
+            tweet.setText(newText);
+            tweetRepository.update(tweet);
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public void viewTweets() throws SQLException {
+    public void chooseTag () {}
 
-    }
 
     private String hashPassword(String password) {
         messageDigest.reset();
