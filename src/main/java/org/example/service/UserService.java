@@ -17,8 +17,7 @@ public interface UserService {
 
     boolean deleteTweet(User user, int tweetId) throws SQLException;
     boolean editTweet(User user, int tweetId, String newText) throws SQLException;
+    void chooseTag(User user, int tweetId, int TagId) throws SQLException;
 
-    void chooseTag ();
-
-
+    void deleteTagForTweet(User user, int tweetId, int tagId) throws SQLException;
 }

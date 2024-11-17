@@ -5,6 +5,7 @@ import org.example.entity.Tag;
 import org.example.repository.TagRepository;
 import org.example.repository.TweetTagRepository;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -88,30 +89,26 @@ public class TagRepositoryImpl implements TagRepository {
     public Tag findById(int id) throws SQLException {
         try (var statement = Datasource.getConnection().prepareStatement(FIND_BY_ID_SQL)) {
             statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            Tag tag = null;
-            if (resultSet.next()) {
-                int tagId = resultSet.getInt(1);
-                String tagTitle = resultSet.getString(2);
-                tag = new Tag(tagId, tagTitle);
-            }
-            return tag;
+            return getTagInfo(statement);
         }
     }
-
 
     @Override
     public Tag findByTitle(String title) throws SQLException {
         try (var statement = Datasource.getConnection().prepareStatement(FIND_BY_TITLE_SQL)) {
             statement.setString(1, title);
-            ResultSet resultSet = statement.executeQuery();
-            Tag tag = null;
-            if (resultSet.next()) {
-                int tagId = resultSet.getInt(1);
-                String tagTitle = resultSet.getString(2);
-                tag = new Tag(tagId, tagTitle);
-            }
-            return tag;
+            return getTagInfo(statement);
         }
+    }
+
+    private Tag getTagInfo (PreparedStatement statement) throws SQLException {
+        ResultSet resultSet = statement.executeQuery();
+        Tag tag = null;
+        if (resultSet.next()) {
+            int tagId = resultSet.getInt(1);
+            String tagTitle = resultSet.getString(2);
+            tag = new Tag(tagId, tagTitle);
+        }
+        return tag;
     }
 }
