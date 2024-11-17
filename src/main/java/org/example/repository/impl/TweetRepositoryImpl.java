@@ -71,7 +71,8 @@ public class TweetRepositoryImpl implements TweetRepository {
 
     @Override
     public Tweet save(Tweet tweet) throws SQLException {
-        try (var statement = Datasource.getConnection().prepareStatement(INSERT_SQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (var statement = Datasource.getConnection().prepareStatement(INSERT_SQL,
+                PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, tweet.getText());
             statement.setInt(2, tweet.getUser().getId());
             if (tweet.getRetweetFrom() != null)
@@ -80,9 +81,8 @@ public class TweetRepositoryImpl implements TweetRepository {
             statement.execute();
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
+                if (generatedKeys.next())
                     tweet.setId(generatedKeys.getInt(1));
-                }
                 return tweet;
             }
         }

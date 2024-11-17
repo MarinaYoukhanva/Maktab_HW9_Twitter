@@ -16,6 +16,7 @@ public class TagRepositoryImpl implements TagRepository {
         tweetTagRepository = new TweetTagRepositoryImpl();
         initTable();
     }
+
     private static final String CREATE_TABLE = """
             CREATE TABLE IF NOT EXISTS tag
             (
@@ -59,10 +60,16 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public Tag save(Tag tag) throws SQLException {
-        try (var statement = Datasource.getConnection().prepareStatement(INSERT_SQL)) {
+        try (var statement = Datasource.getConnection().prepareStatement(INSERT_SQL,
+                PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, tag.getTitle());
             statement.execute();
-            return tag;
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next())
+                    tag.setId(generatedKeys.getInt(1));
+                return tag;
+            }
         }
     }
 
@@ -101,7 +108,7 @@ public class TagRepositoryImpl implements TagRepository {
         }
     }
 
-    private Tag getTagInfo (PreparedStatement statement) throws SQLException {
+    private Tag getTagInfo(PreparedStatement statement) throws SQLException {
         ResultSet resultSet = statement.executeQuery();
         Tag tag = null;
         if (resultSet.next()) {

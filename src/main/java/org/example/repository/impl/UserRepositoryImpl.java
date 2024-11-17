@@ -68,10 +68,16 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User save(User user) throws SQLException {
-        try (var statement = Datasource.getConnection().prepareStatement(INSERT_SQL)) {
+        try (var statement = Datasource.getConnection().prepareStatement(INSERT_SQL,
+                PreparedStatement.RETURN_GENERATED_KEYS)) {
             setUserInfo(user, statement);
             statement.execute();
-            return user;
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next())
+                    user.setId(generatedKeys.getInt(1));
+                return user;
+            }
         }
     }
 
@@ -101,17 +107,19 @@ public class UserRepositoryImpl implements UserRepository {
             ResultSet resultSet = statement.executeQuery();
             User user = null;
             if (resultSet.next()) {
-                user = getUserInfo (resultSet);
+                user = getUserInfo(resultSet);
             }
             return user;
         }
     }
+
     @Override
     public User findByUsername(String username) throws SQLException {
         return findUser(username, FIND_BY_USERNAME_SQL);
     }
+
     @Override
-    public User findByEmail (String email) throws SQLException {
+    public User findByEmail(String email) throws SQLException {
         return findUser(email, FIND_BY_EMAIL_SQL);
     }
 
@@ -121,7 +129,7 @@ public class UserRepositoryImpl implements UserRepository {
             ResultSet resultSet = statement.executeQuery();
             User user = null;
             if (resultSet.next()) {
-                user = getUserInfo (resultSet);
+                user = getUserInfo(resultSet);
             }
             return user;
         }
@@ -135,7 +143,7 @@ public class UserRepositoryImpl implements UserRepository {
         statement.setString(5, user.getBio());
     }
 
-    private User getUserInfo (ResultSet resultSet) throws SQLException {
+    private User getUserInfo(ResultSet resultSet) throws SQLException {
         int userId = resultSet.getInt(1);
         String displayName = resultSet.getString(2);
         String email = resultSet.getString(3);
