@@ -3,6 +3,9 @@ package org.example.view;
 import org.example.entity.Tag;
 import org.example.entity.Tweet;
 import org.example.entity.User;
+import org.example.exception.IncorrectEmailFormat;
+import org.example.exception.IncorrectPasswordException;
+import org.example.exception.UserNotFoundException;
 import org.example.service.Authentication;
 import org.example.service.TagService;
 import org.example.service.TweetService;
@@ -56,33 +59,47 @@ public class View {
                 int loginChoice = sc.nextInt();
                 switch (loginChoice) {
                     case 1:
-                        System.out.println("Enter your Email ");
-                        String loginEmail = sc.next();
-                        System.out.println("Enter your Password ");
-                        String loginPassword = sc.next();
-                        user = userService.loginWithEmail(loginEmail, loginPassword);
-                        if (user == null)
-                            System.out.println("Email or Password is wrong ");
-                        else System.out.println("Login was successful ");
+                        tryToLoginWithEmailMenu();
+                        while (Authentication.getLoggedInUser() != null)
+                            loggedInMenu();
                         break;
                     case 2:
-                        System.out.println("Enter your Username ");
-                        String loginUsername = sc.next();
-                        System.out.println("Enter your Password ");
-                        String loginPassword2 = sc.next();
-                        user = userService.loginWithUsername(loginUsername, loginPassword2);
-                        if (user == null)
-                            System.out.println("Username or Password is wrong ");
-                        else {
-                            System.out.println("Login was successful ");
-                            System.out.println("Welcome dear " + user.getDisplayName());
-                        }
+                        tryToLoginWithUsernameMenu();
                         while (Authentication.getLoggedInUser() != null)
                             loggedInMenu();
                         break;
                 }
         }
+    }
 
+    private void tryToLoginWithEmailMenu() {
+        System.out.println("Enter your Email ");
+        String loginEmail = sc.next();
+        System.out.println("Enter your Password ");
+        String loginPassword = sc.next();
+        try {
+            user = userService.loginWithEmail(loginEmail, loginPassword);
+            System.out.println("Login was successful ");
+            System.out.println("Welcome dear " + user.getDisplayName());
+        } catch (UserNotFoundException | IncorrectPasswordException | IncorrectEmailFormat e) {
+            System.out.println(e.getMessage());
+            tryToLoginWithEmailMenu();
+        }
+    }
+
+    private void tryToLoginWithUsernameMenu() {
+        System.out.println("Enter your Username ");
+        String loginUsername = sc.next();
+        System.out.println("Enter your Password ");
+        String loginPassword = sc.next();
+        try {
+            user = userService.loginWithUsername(loginUsername, loginPassword);
+            System.out.println("Login was successful ");
+            System.out.println("Welcome dear " + user.getDisplayName());
+        } catch (UserNotFoundException | IncorrectPasswordException e) {
+            System.out.println(e.getMessage());
+            tryToLoginWithUsernameMenu();
+        }
     }
 
     private void loggedInMenu() throws SQLException {
