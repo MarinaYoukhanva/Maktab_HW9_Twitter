@@ -15,6 +15,31 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    public Tag save(Tag tag) throws SQLException {
+        return tagRepository.save(tag);
+    }
+
+    @Override
+    public Tag update(Tag tag) throws SQLException {
+        return tagRepository.update(tag);
+    }
+
+    @Override
+    public void deleteById(int id) throws SQLException {
+        tagRepository.deleteById(id);
+    }
+
+    @Override
+    public Tag findById(int id) throws SQLException {
+        return tagRepository.findById(id);
+    }
+
+    @Override
+    public Tag findByTitle(String title) throws SQLException {
+        return tagRepository.findByTitle(title);
+    }
+
+    @Override
     public void createTag(String title) throws SQLException {
         if (tagRepository.findByTitle(title) != null) {
             Tag tag = new Tag(0, title);

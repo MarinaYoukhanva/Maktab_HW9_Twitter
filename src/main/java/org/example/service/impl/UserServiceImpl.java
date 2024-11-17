@@ -1,19 +1,10 @@
 package org.example.service.impl;
 
 import org.apache.commons.codec.binary.Hex;
-import org.example.entity.Tag;
-import org.example.entity.Tweet;
-import org.example.entity.User;
-import org.example.repository.TagRepository;
-import org.example.repository.TweetRepository;
-import org.example.repository.TweetTagRepository;
+import org.example.entity.*;
+import org.example.service.*;
 import org.example.repository.UserRepository;
-import org.example.repository.impl.TagRepositoryImpl;
-import org.example.repository.impl.TweetRepositoryImpl;
-import org.example.repository.impl.TweetTagRepositoryImpl;
 import org.example.repository.impl.UserRepositoryImpl;
-import org.example.service.Authentication;
-import org.example.service.UserService;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -24,17 +15,47 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
-    TweetRepository tweetRepository;
-    TagRepository tagRepository;
-    TweetTagRepository tweetTagRepository;
+    TweetService tweetService;
+    TagService tagService;
+    TweetTagService tweetTagService;
     final MessageDigest messageDigest = MessageDigest.getInstance("MD5");
 
 
     public UserServiceImpl() throws SQLException, NoSuchAlgorithmException {
         userRepository = new UserRepositoryImpl();
-        tweetRepository = new TweetRepositoryImpl();
-        tagRepository = new TagRepositoryImpl();
-        tweetTagRepository = new TweetTagRepositoryImpl();
+        tweetService = new TweetServiceImpl();
+        tagService = new TagServiceImpl();
+        tweetTagService = new TweetTagServiceImpl();
+    }
+
+    @Override
+    public User save(User user) throws SQLException {
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User update(User user) throws SQLException {
+        return userRepository.update(user);
+    }
+
+    @Override
+    public void deleteById(int id) throws SQLException {
+        userRepository.deleteById(id);
+    }
+
+    @Override
+    public User findById(int id) throws SQLException {
+        return userRepository.findById(id);
+    }
+
+    @Override
+    public User findByUsername(String username) throws SQLException {
+        return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public User findByEmail(String email) throws SQLException {
+        return userRepository.findByEmail(email);
     }
 
     @Override
@@ -80,14 +101,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Tweet postTweet(User user, String text, int retweetFromId) throws SQLException {
-        Tweet retweetFrom = tweetRepository.findById(retweetFromId);
+        Tweet retweetFrom = tweetService.findById(retweetFromId);
         Tweet tweet = new Tweet(0, text, 0, 0, user, retweetFrom);
-        return tweetRepository.save(tweet);
+        return tweetService.save(tweet);
     }
 
     @Override
     public boolean viewMyTweets(User user) throws SQLException {
-        List<Tweet> tweets = tweetRepository.findByUser(user);
+        List<Tweet> tweets = tweetService.findByUser(user);
         if (!tweets.isEmpty()) {
             for (Tweet tweet : tweets) {
                 System.out.println(tweet);
@@ -99,10 +120,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean deleteTweet(User user, int tweetId) throws SQLException {
-        List<Tweet> tweets = tweetRepository.findByUser(user);
-        Tweet tweet = tweetRepository.findById(tweetId);
+        List<Tweet> tweets = tweetService.findByUser(user);
+        Tweet tweet = tweetService.findById(tweetId);
         if (tweets.contains(tweet)) {
-            tweetRepository.deleteById(tweetId);
+            tweetService.deleteById(tweetId);
             return true;
         }
         return false;
@@ -113,7 +134,7 @@ public class UserServiceImpl implements UserService {
         Tweet tweet = doesUserOwnTweet(user, tweetId);
         if (tweet != null) {
             tweet.setText(newText);
-            tweetRepository.update(tweet);
+            tweetService.update(tweet);
             return true;
         }
         return false;
@@ -125,18 +146,19 @@ public class UserServiceImpl implements UserService {
         if (tweet != null) {
             Tag tag = hasTweetTheTag(tweetId, tagId);
             if (tag != null) {
-                tweetTagRepository.save(tweet, tag);
+                tweetTagService.save(tweet, tag);
                 tweet.getTags().add(tag);
             }
         }
     }
+
     @Override
     public void deleteTagForTweet(User user, int tweetId, int tagId) throws SQLException {
         Tweet tweet = doesUserOwnTweet(user, tweetId);
         if (tweet != null) {
             Tag tag = hasTweetTheTag(tweetId, tagId);
             if (tag != null) {
-                tweetTagRepository.deleteById(tweetId, tagId);
+                tweetTagService.deleteById(tweetId, tagId);
                 tweet.getTags().remove(tag);
             }
         }
@@ -151,16 +173,16 @@ public class UserServiceImpl implements UserService {
     }
 
     private Tweet doesUserOwnTweet(User user, int tweetId) throws SQLException {
-        List<Tweet> tweets = tweetRepository.findByUser(user);
-        Tweet tweet = tweetRepository.findById(tweetId);
+        List<Tweet> tweets = tweetService.findByUser(user);
+        Tweet tweet = tweetService.findById(tweetId);
         if (tweets.contains(tweet))
             return tweet;
         return null;
     }
 
     private Tag hasTweetTheTag(int tweetId, int tagId) throws SQLException {
-        List<Tag> tags = tweetTagRepository.findTagsForTweet(tweetId);
-        Tag tag = tagRepository.findById(tagId);
+        List<Tag> tags = tweetTagService.findTagsForTweet(tweetId);
+        Tag tag = tagService.findById(tagId);
         if (tags.contains(tag))
             return tag;
         return null;
