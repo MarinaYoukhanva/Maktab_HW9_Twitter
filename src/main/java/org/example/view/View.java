@@ -1,5 +1,7 @@
 package org.example.view;
 
+import org.example.entity.Tag;
+import org.example.entity.Tweet;
 import org.example.entity.User;
 import org.example.service.Authentication;
 import org.example.service.TagService;
@@ -11,6 +13,7 @@ import org.example.service.impl.UserServiceImpl;
 
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class View {
@@ -96,7 +99,30 @@ public class View {
             case 1:
                 System.out.println("Enter your Tweet ");
                 text = sc.next();
-                tweetService.postTweet(user, text, 0);
+                Tweet tweet = tweetService.postTweet(user, text, 0);
+                System.out.println("Do you need tags? (y/n) ");
+                String tagChoice = sc.next();
+                while (tagChoice.equalsIgnoreCase("y")) {
+                    System.out.println(tagService.findAll());
+                    System.out.println("1.chose an existing tag ");
+                    System.out.println("2.create a new tag ");
+                    choiceForTweet = sc.nextInt();
+                    switch (choiceForTweet) {
+                        case 1:
+                            System.out.println("Enter tag id ");
+                            int tagId = sc.nextInt();
+                            tagService.chooseTag(user, tweet.getId(), tagId);
+                            break;
+                        case 2:
+                            System.out.println("Enter tag title: ");
+                            String tagTitle = sc.next();
+                            Tag tag = tagService.createTag(tagTitle);
+                            tagService.chooseTag(user, tweet.getId(), tag.getId());
+                            break;
+                    }
+                    System.out.println("Do you need tags? (y/n) ");
+                    tagChoice = sc.next();
+                }
                 break;
             case 2:
                 tweetService.viewMyTweets(user);

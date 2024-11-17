@@ -1,9 +1,12 @@
 package org.example.repository.impl;
 
 import org.example.Datasource;
+import org.example.entity.Tag;
 import org.example.entity.Tweet;
 import org.example.entity.User;
 import org.example.repository.TweetRepository;
+import org.example.service.TweetTagService;
+import org.example.service.impl.TweetTagServiceImpl;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,6 +17,7 @@ import java.util.List;
 public class TweetRepositoryImpl implements TweetRepository {
 
     UserRepositoryImpl userRepository = new UserRepositoryImpl();
+    TweetTagService tweetTagService = new TweetTagServiceImpl();
 
     private static final String CREATE_TABLE = """
             CREATE TABLE IF NOT EXISTS tweet
@@ -116,7 +120,7 @@ public class TweetRepositoryImpl implements TweetRepository {
             ResultSet resultSet = statement.executeQuery();
             Tweet tweet = null;
             if (resultSet.next()) {
-                tweet = getTweetInfo (resultSet);
+                tweet = getTweetInfo(resultSet);
             }
             return tweet;
         }
@@ -129,21 +133,13 @@ public class TweetRepositoryImpl implements TweetRepository {
             ResultSet resultSet = statement.executeQuery();
             List<Tweet> tweets = new ArrayList<>();
             while (resultSet.next()) {
-                int tweetId = resultSet.getInt(1);
-                String text = resultSet.getString(2);
-                int likes = resultSet.getInt(3);
-                int dislikes = resultSet.getInt(4);
-                int retweetFromId = resultSet.getInt(6);
-                Tweet retweetFrom = null;
-                if (retweetFromId != 0) {
-                    retweetFrom = findById(retweetFromId);
-                }
-                Tweet tweet = new Tweet(tweetId, text, likes, dislikes, user, retweetFrom);
+                Tweet tweet = getTweetInfo(resultSet);
                 tweets.add(tweet);
             }
             return tweets;
         }
     }
+
     @Override
     public List<Tweet> findAll() throws SQLException {
         try (var statement = Datasource.getConnection().prepareStatement(SHOW_TWEETS_SQL)) {
@@ -156,7 +152,8 @@ public class TweetRepositoryImpl implements TweetRepository {
             return tweets;
         }
     }
-    private Tweet getTweetInfo (ResultSet resultSet) throws SQLException {
+
+    private Tweet getTweetInfo(ResultSet resultSet) throws SQLException {
         int tweetId = resultSet.getInt(1);
         String text = resultSet.getString(2);
         int likes = resultSet.getInt(3);
@@ -168,6 +165,7 @@ public class TweetRepositoryImpl implements TweetRepository {
         if (retweetFromId != 0) {
             retweetFrom = findById(retweetFromId);
         }
-        return new Tweet(tweetId, text, likes, dislikes, user, retweetFrom);
+        List<Tag> tags = tweetTagService.findTagsForTweet(tweetId);
+        return new Tweet(tweetId, text, likes, dislikes, user, retweetFrom, tags);
     }
 }

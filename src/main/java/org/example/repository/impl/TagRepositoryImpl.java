@@ -8,6 +8,8 @@ import org.example.repository.TweetTagRepository;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TagRepositoryImpl implements TagRepository {
     TweetTagRepository tweetTagRepository;
@@ -49,6 +51,9 @@ public class TagRepositoryImpl implements TagRepository {
     private static final String FIND_BY_TITLE_SQL = """
             SELECT * FROM tag
             WHERE title = ?
+            """;
+    private static final String SHOW_ALL_TAGS_SQL = """
+            SELECT * FROM tag
             """;
 
     @Override
@@ -105,6 +110,19 @@ public class TagRepositoryImpl implements TagRepository {
         try (var statement = Datasource.getConnection().prepareStatement(FIND_BY_TITLE_SQL)) {
             statement.setString(1, title);
             return getTagInfo(statement);
+        }
+    }
+    @Override
+    public List<Tag> findAll() throws SQLException {
+        try (var statement = Datasource.getConnection().prepareStatement(SHOW_ALL_TAGS_SQL)) {
+            ResultSet resultSet = statement.executeQuery();
+            List<Tag> tags = new ArrayList<>();
+            while (resultSet.next()) {
+                int tagId = resultSet.getInt(1);
+                String title = resultSet.getString(2);
+                tags.add(new Tag(tagId, title));
+            }
+            return tags;
         }
     }
 

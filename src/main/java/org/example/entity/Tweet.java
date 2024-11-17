@@ -28,6 +28,7 @@ public class Tweet {
         this.dislikes = dislikes;
         this.likes = likes;
         this.text = text;
+        this.tags = new ArrayList<>();
     }
 
     @Override
@@ -37,12 +38,10 @@ public class Tweet {
             retweetFromId = retweetFrom.getId();
         } else retweetFromId = null;
         List<String> tagsTitles = new ArrayList<>();
-        if (tags != null) {
             for (Tag tag : tags) {
-                tagsTitles = new ArrayList<>();
-                tagsTitles.add(tag.getTitle());
-            }
-        } else tagsTitles = null;
+                String tagTitle = tag.getTitle();
+                tagsTitles.add(tagTitle);
+        }
 
         return "Tweet {" + '\n' +
                 '\t' + " id : " + id + '\n' +

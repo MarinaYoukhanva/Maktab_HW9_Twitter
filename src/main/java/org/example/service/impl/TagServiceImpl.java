@@ -49,6 +49,11 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    public List<Tag> findAll() throws SQLException {
+        return tagRepository.findAll();
+    }
+
+    @Override
     public void chooseTag(User user, int tweetId, int tagId) throws SQLException {
         Tweet tweet = tweetService.doesUserOwnTweet(user, tweetId);
         if (tweet != null) {
@@ -73,17 +78,18 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void createTag(String title) throws SQLException {
-        if (tagRepository.findByTitle(title) != null) {
+    public Tag createTag(String title) throws SQLException {
+        if (tagRepository.findByTitle(title) == null) {
             Tag tag = new Tag(0, title);
-            tagRepository.save(tag);
+            return tagRepository.save(tag);
         }
+        return null;
     }
 
     private Tag hasTweetTheTag(int tweetId, int tagId) throws SQLException {
         List<Tag> tags = tweetTagService.findTagsForTweet(tweetId);
         Tag tag = findById(tagId);
-        if (tags.contains(tag))
+        if (!tags.contains(tag))
             return tag;
         return null;
     }

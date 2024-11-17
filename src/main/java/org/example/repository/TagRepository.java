@@ -3,6 +3,7 @@ package org.example.repository;
 import org.example.entity.Tag;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public interface TagRepository {
 
@@ -12,4 +13,5 @@ public interface TagRepository {
     void deleteById(int id) throws SQLException;
     Tag findById(int id) throws SQLException;
     Tag findByTitle(String title) throws SQLException;
+    List<Tag> findAll() throws SQLException;
 }
