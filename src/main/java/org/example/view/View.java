@@ -96,10 +96,10 @@ public class View {
             case 1:
                 System.out.println("Enter your Tweet ");
                 text = sc.next();
-                userService.postTweet(user, text, 0);
+                tweetService.postTweet(user, text, 0);
                 break;
             case 2:
-                userService.viewMyTweets(user);
+                tweetService.viewMyTweets(user);
                 System.out.println("1.Delete tweet ");
                 System.out.println("2.Edit tweet ");
                 System.out.println("3.Back to Previous menu ");
@@ -108,7 +108,7 @@ public class View {
                     case 1:
                         System.out.println("Which tweet would you like to delete? ");
                         tweetId = sc.nextInt();
-                        if (userService.deleteTweet(user, tweetId))
+                        if (tweetService.deleteTweet(user, tweetId))
                             System.out.println("Deleting tweet was successful ");
                         else
                             System.out.println("Tweet not found! ");
@@ -118,7 +118,7 @@ public class View {
                         tweetId = sc.nextInt();
                         System.out.println("Enter you new text ");
                         text = sc.next();
-                        if (userService.editTweet(user, tweetId, text))
+                        if (tweetService.editTweet(user, tweetId, text))
                             System.out.println("Editing tweet was successful ");
                         else
                             System.out.println("Tweet not found! ");
@@ -151,7 +151,7 @@ public class View {
                             case 3:
                                 System.out.println("Enter your Tweet");
                                 text = sc.next();
-                                userService.postTweet(user, text, tweetId);
+                                tweetService.postTweet(user, text, tweetId);
                         }
                         break;
                     case 2:
