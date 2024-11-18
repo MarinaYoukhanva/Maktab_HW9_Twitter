@@ -175,10 +175,12 @@ public class View {
                             case 1:
                                 System.out.println("Enter you new text ");
                                 text = sc.next();
-                                if (tweetService.editTweet(user, tweetId, text))
+                                try {
+                                    tweetService.editTweet(user, tweetId, text);
                                     System.out.println("Editing tweet was successful ");
-                                else
-                                    System.out.println("Tweet not found! ");
+                                } catch (UserDoesNotOwnTweetException e) {
+                                    System.out.println(e.getMessage());
+                                }
                                 break;
                             case 2:
                                 break;

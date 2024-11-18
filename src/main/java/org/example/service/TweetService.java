@@ -17,8 +17,8 @@ public interface TweetService {
 
     Tweet postTweet(User user, String text, int retweetFromId) throws SQLException;
     boolean viewMyTweets(User user) throws SQLException;
-    boolean deleteTweet(User user, int tweetId) throws SQLException;
-    boolean editTweet(User user, int tweetId, String newText) throws SQLException;
+    void deleteTweet(User user, int tweetId) throws SQLException;
+    void editTweet(User user, int tweetId, String newText) throws SQLException;
     void viewAllTweets() throws SQLException;
     void likeTweet(int tweetId) throws SQLException;
     void dislikeTweet(int tweetId) throws SQLException;

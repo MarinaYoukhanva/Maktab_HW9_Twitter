@@ -68,24 +68,21 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public boolean deleteTweet(User user, int tweetId) throws SQLException {
-        List<Tweet> tweets = findByUser(user);
-        Tweet tweet = findById(tweetId);
-        if (!tweets.contains(tweet))
-            throw new UserDoesNotOwnTweetException();
+    public void deleteTweet(User user, int tweetId) throws SQLException {
+        doesUserOwnTweet(user, tweetId);
         deleteById(tweetId);
-        return true;
     }
 
     @Override
-    public boolean editTweet(User user, int tweetId, String newText) throws SQLException {
-        Tweet tweet = doesUserOwnTweet(user, tweetId);
-        if (tweet != null) {
+    public void editTweet(User user, int tweetId, String newText) throws SQLException {
+        Tweet tweet;
+        try {
+            tweet = doesUserOwnTweet(user, tweetId);
             tweet.setText(newText);
             update(tweet);
-            return true;
+        } catch (NullPointerException e) {
+            throw new UserDoesNotOwnTweetException();
         }
-        return false;
     }
 
     @Override
@@ -114,9 +111,9 @@ public class TweetServiceImpl implements TweetService {
     public Tweet doesUserOwnTweet(User user, int tweetId) throws SQLException {
         List<Tweet> tweets = findByUser(user);
         Tweet tweet = findById(tweetId);
-        if (tweets.contains(tweet))
-            return tweet;
-        return null;
+        if (!tweets.contains(tweet))
+            throw new UserDoesNotOwnTweetException();
+        return tweet;
     }
 
 
