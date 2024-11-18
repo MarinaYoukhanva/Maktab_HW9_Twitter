@@ -158,10 +158,12 @@ public class View {
                     case 1:
                         System.out.println("Which tweet would you like to delete? ");
                         tweetId = sc.nextInt();
-                        if (tweetService.deleteTweet(user, tweetId))
+                        try {
+                            tweetService.deleteTweet(user, tweetId);
                             System.out.println("Deleting tweet was successful ");
-                        else
-                            System.out.println("Tweet not found! ");
+                        } catch (UserDoesNotOwnTweetException e) {
+                            System.out.println(e.getMessage());
+                        }
                         break;
                     case 2:
                         System.out.println("Which tweet would you like to edit? ");

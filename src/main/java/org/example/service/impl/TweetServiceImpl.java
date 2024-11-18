@@ -2,6 +2,7 @@ package org.example.service.impl;
 
 import org.example.entity.Tweet;
 import org.example.entity.User;
+import org.example.exception.UserDoesNotOwnTweetException;
 import org.example.repository.TweetRepository;
 import org.example.repository.impl.TweetRepositoryImpl;
 import org.example.service.TweetService;
@@ -70,11 +71,10 @@ public class TweetServiceImpl implements TweetService {
     public boolean deleteTweet(User user, int tweetId) throws SQLException {
         List<Tweet> tweets = findByUser(user);
         Tweet tweet = findById(tweetId);
-        if (tweets.contains(tweet)) {
-            deleteById(tweetId);
-            return true;
-        }
-        return false;
+        if (!tweets.contains(tweet))
+            throw new UserDoesNotOwnTweetException();
+        deleteById(tweetId);
+        return true;
     }
 
     @Override
@@ -95,6 +95,7 @@ public class TweetServiceImpl implements TweetService {
             System.out.println(tweet);
         }
     }
+
     @Override
     public void likeTweet(int tweetId) throws SQLException {
         Tweet tweet = tweetRepository.findById(tweetId);
@@ -108,6 +109,7 @@ public class TweetServiceImpl implements TweetService {
         tweet.setDislikes(tweet.getDislikes() + 1);
         tweetRepository.update(tweet);
     }
+
     @Override
     public Tweet doesUserOwnTweet(User user, int tweetId) throws SQLException {
         List<Tweet> tweets = findByUser(user);
