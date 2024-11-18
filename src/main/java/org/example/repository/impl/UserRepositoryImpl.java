@@ -118,6 +118,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findByUsername(String username) {
         return findUser(username, FIND_BY_USERNAME_SQL);
+
     }
 
     @Override
@@ -128,15 +129,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     private User findUser(String columnName, String findSQL) {
-        User user;
+        User user = null;
         try (var statement = Datasource.getConnection().prepareStatement(findSQL)) {
             statement.setString(1, columnName);
             ResultSet resultSet = statement.executeQuery();
-            try {
-                //resultSet.next();
+            if (resultSet.next()) {
                 user = getUserInfo(resultSet);
-            } catch (RuntimeException e) {
-                throw new UserNotFoundException();
             }
         } catch (SQLException e) {
             throw new RuntimeException();
@@ -152,18 +150,15 @@ public class UserRepositoryImpl implements UserRepository {
         statement.setString(5, user.getBio());
     }
 
-    private User getUserInfo(ResultSet resultSet) {
-        try {
-            int userId = resultSet.getInt(1);
-            String displayName = resultSet.getString(2);
-            String email = resultSet.getString(3);
-            String username = resultSet.getString(4);
-            String password = resultSet.getString(5);
-            String bio = resultSet.getString(6);
-            LocalDate creationDate = resultSet.getDate(7).toLocalDate();
-            return new User(userId, displayName, email, username, password, bio, creationDate);
-        } catch (SQLException e) {
-            throw new RuntimeException();
-        }
+    private User getUserInfo(ResultSet resultSet) throws SQLException {
+        int userId = resultSet.getInt(1);
+        String displayName = resultSet.getString(2);
+        String email = resultSet.getString(3);
+        String username = resultSet.getString(4);
+        String password = resultSet.getString(5);
+        String bio = resultSet.getString(6);
+        LocalDate creationDate = resultSet.getDate(7).toLocalDate();
+        return new User(userId, displayName, email, username, password, bio, creationDate);
+
     }
 }
