@@ -11,8 +11,14 @@ public interface TweetRepository {
     void initTable() throws SQLException;
     Tweet save(Tweet tweet) throws SQLException;
     Tweet update(Tweet tweet) throws SQLException;
+
+    Tweet removeParent(Tweet tweet) throws SQLException;
+
     void deleteById(int id) throws SQLException;
     Tweet findById(int id) throws SQLException;
     List<Tweet> findByUser(User user) throws SQLException;
+
+    List<Tweet> findRetweets(int parentId) throws SQLException;
+
     List<Tweet> findAll() throws SQLException;
 }

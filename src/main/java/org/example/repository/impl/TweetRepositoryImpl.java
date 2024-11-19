@@ -42,6 +42,12 @@ public class TweetRepositoryImpl implements TweetRepository {
             WHERE id = ?
             """;
 
+    private static final String UPDATE_PARENT_TO_NULL = """
+            UPDATE tweet
+            SET retweet_from_id = NULL
+            WHERE id = ?
+            """;
+
     private static final String DELETE_BY_ID_SQL = """
             DELETE FROM tweet
             WHERE id = ?
@@ -56,9 +62,14 @@ public class TweetRepositoryImpl implements TweetRepository {
             SELECT * FROM tweet
             WHERE user_id = ?
             """;
+
+    private static final String FIND_RETWEETS_SQL = """
+            SELECT * FROM tweet
+            WHERE retweet_from_id = ?
+            """;
+
     private static final String SHOW_TWEETS_SQL = """
             SELECT * FROM tweet
-            ORDER BY id DESC
             """;
 
 
@@ -103,6 +114,14 @@ public class TweetRepositoryImpl implements TweetRepository {
             return tweet;
         }
     }
+    @Override
+    public Tweet removeParent(Tweet tweet) throws SQLException {
+        try (var statement = Datasource.getConnection().prepareStatement(UPDATE_PARENT_TO_NULL)) {
+            statement.setInt(1, tweet.getId());
+            statement.execute();
+            return tweet;
+        }
+    }
 
     @Override
     public void deleteById(int id) throws SQLException {
@@ -130,6 +149,19 @@ public class TweetRepositoryImpl implements TweetRepository {
     public List<Tweet> findByUser(User user) throws SQLException {
         try (var statement = Datasource.getConnection().prepareStatement(FIND_BY_USER_SQL)) {
             statement.setInt(1, user.getId());
+            ResultSet resultSet = statement.executeQuery();
+            List<Tweet> tweets = new ArrayList<>();
+            while (resultSet.next()) {
+                Tweet tweet = getTweetInfo(resultSet);
+                tweets.add(tweet);
+            }
+            return tweets;
+        }
+    }
+    @Override
+    public List<Tweet> findRetweets(int parentId) throws SQLException {
+        try (var statement = Datasource.getConnection().prepareStatement(FIND_RETWEETS_SQL)) {
+            statement.setInt(1, parentId);
             ResultSet resultSet = statement.executeQuery();
             List<Tweet> tweets = new ArrayList<>();
             while (resultSet.next()) {

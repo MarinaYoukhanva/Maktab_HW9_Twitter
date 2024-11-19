@@ -133,7 +133,11 @@ public class View {
                 }
                 break;
             case 2:
-                tweetService.viewMyTweets(user);
+                try {
+                    tweetService.viewMyTweets(user);
+                } catch (TweetListIsEmptyException e) {
+                    System.out.println(e.getMessage());
+                }
                 System.out.println("1.Delete tweet ");
                 System.out.println("2.Edit tweet ");
                 System.out.println("3.Back to Previous menu ");
@@ -143,8 +147,12 @@ public class View {
                         System.out.println("Which tweet would you like to delete? ");
                         tweetId = sc.nextInt();
                         try {
-                            tweetService.deleteTweet(user, tweetId);
-                            System.out.println("Deleting tweet was successful ");
+                            try {
+                                tweetService.deleteTweet(user, tweetId);
+                                System.out.println("Deleting tweet was successful ");
+                            } catch (RuntimeException e) {
+                                System.out.println(e.getMessage());
+                            }
                         } catch (UserDoesNotOwnTweetException e) {
                             System.out.println(e.getMessage());
                         }

@@ -3,6 +3,7 @@ package org.example.service.impl;
 import org.example.entity.Tag;
 import org.example.entity.Tweet;
 import org.example.entity.User;
+import org.example.exception.TweetListIsEmptyException;
 import org.example.exception.UserDoesNotOwnTweetException;
 import org.example.repository.TweetRepository;
 import org.example.repository.impl.TweetRepositoryImpl;
@@ -31,6 +32,10 @@ public class TweetServiceImpl implements TweetService {
     public Tweet update(Tweet tweet) throws SQLException {
         return tweetRepository.update(tweet);
     }
+    @Override
+    public Tweet removeParent(Tweet tweet) throws SQLException{
+        return tweetRepository.removeParent(tweet);
+    }
 
     @Override
     public void deleteById(int id) throws SQLException {
@@ -46,6 +51,10 @@ public class TweetServiceImpl implements TweetService {
     public List<Tweet> findByUser(User user) throws SQLException {
         return tweetRepository.findByUser(user);
     }
+    @Override
+    public List<Tweet> findRetweets(int parentId) throws SQLException {
+        return tweetRepository.findRetweets(parentId);
+    }
 
     @Override
     public List<Tweet> findAll() throws SQLException {
@@ -60,17 +69,11 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public boolean viewMyTweets(User user) throws SQLException {
+    public void viewMyTweets(User user) throws SQLException {
         List<Tweet> tweets = findByUser(user);
-        if (!tweets.isEmpty()) {
-            for (Tweet tweet : tweets) {
-                if (tweet.getRetweetFrom() != null)
-                    tweet.setText(tweet.getRetweetFrom().getText() + "'  '" + tweet.getText());
-                System.out.println(tweet);
-            }
-            return true;
-        }
-        return false;
+        if (tweets.isEmpty())
+            throw new TweetListIsEmptyException();
+        showTweetList(tweets);
     }
 
     @Override
@@ -79,6 +82,11 @@ public class TweetServiceImpl implements TweetService {
         List<Tag> tags = tweetTagService.findTagsForTweet(tweetId);
         for (Tag tag : tags)
             tweetTagService.deleteById(tweetId, tag.getId());
+        List<Tweet> retweets = findRetweets(tweetId);
+        for (Tweet retweet : retweets){
+            removeParent(retweet);
+            retweet.setRetweetFrom(null);
+        }
         deleteById(tweetId);
     }
 
@@ -96,12 +104,8 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public void viewAllTweets() throws SQLException {
-        List<Tweet> tweets = tweetRepository.findAll();
-        for (Tweet tweet : tweets) {
-            if (tweet.getRetweetFrom() != null)
-                tweet.setText(tweet.getRetweetFrom().getText() + "'  '" + tweet.getText());
-            System.out.println(tweet);
-        }
+        List<Tweet> tweets = findAll();
+        showTweetList(tweets);
     }
 
     @Override
@@ -125,6 +129,17 @@ public class TweetServiceImpl implements TweetService {
         if (!tweets.contains(tweet))
             throw new UserDoesNotOwnTweetException();
         return tweet;
+    }
+
+    private void showTweetList(List<Tweet> tweets) {
+        for (Tweet tweet : tweets) {
+            try {
+                tweet.setText(tweet.getRetweetFrom().getText() + "'  '" + tweet.getText());
+            } catch (NullPointerException _) {
+            } finally {
+                System.out.println(tweet);
+            }
+        }
     }
 
 

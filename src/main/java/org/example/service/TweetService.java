@@ -10,13 +10,15 @@ public interface TweetService {
 
     Tweet save(Tweet tweet) throws SQLException;
     Tweet update(Tweet tweet) throws SQLException;
+    Tweet removeParent(Tweet tweet) throws SQLException;
     void deleteById(int id) throws SQLException;
     Tweet findById(int id) throws SQLException;
     List<Tweet> findByUser(User user) throws SQLException;
+    List<Tweet> findRetweets(int parentId) throws SQLException;
     List<Tweet> findAll() throws SQLException;
 
     Tweet postTweet(User user, String text, int retweetFromId) throws SQLException;
-    boolean viewMyTweets(User user) throws SQLException;
+    void viewMyTweets(User user) throws SQLException;
     void deleteTweet(User user, int tweetId) throws SQLException;
     void editTweet(User user, int tweetId, String newText) throws SQLException;
     void viewAllTweets() throws SQLException;
