@@ -8,10 +8,10 @@ import java.util.List;
 public interface TagRepository {
 
     void initTable() throws SQLException;
-    Tag save(Tag tag) throws SQLException;
-    Tag update(Tag tag) throws SQLException;
-    void deleteById(int id) throws SQLException;
-    Tag findById(int id) throws SQLException;
-    Tag findByTitle(String title) throws SQLException;
-    List<Tag> findAll() throws SQLException;
+    Tag save(Tag tag);
+    Tag update(Tag tag);
+    void deleteById(int id);
+    Tag findById(int id);
+    Tag findByTitle(String title);
+    List<Tag> findAll();
 }

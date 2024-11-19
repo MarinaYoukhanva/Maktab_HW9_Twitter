@@ -24,52 +24,52 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public Tweet save(Tweet tweet) throws SQLException {
+    public Tweet save(Tweet tweet) {
         return tweetRepository.save(tweet);
     }
 
     @Override
-    public Tweet update(Tweet tweet) throws SQLException {
+    public Tweet update(Tweet tweet) {
         return tweetRepository.update(tweet);
     }
     @Override
-    public Tweet removeParent(Tweet tweet) throws SQLException{
+    public Tweet removeParent(Tweet tweet){
         return tweetRepository.removeParent(tweet);
     }
 
     @Override
-    public void deleteById(int id) throws SQLException {
+    public void deleteById(int id)  {
         tweetRepository.deleteById(id);
     }
 
     @Override
-    public Tweet findById(int id) throws SQLException {
+    public Tweet findById(int id)  {
         return tweetRepository.findById(id);
     }
 
     @Override
-    public List<Tweet> findByUser(User user) throws SQLException {
+    public List<Tweet> findByUser(User user)  {
         return tweetRepository.findByUser(user);
     }
     @Override
-    public List<Tweet> findRetweets(int parentId) throws SQLException {
+    public List<Tweet> findRetweets(int parentId) {
         return tweetRepository.findRetweets(parentId);
     }
 
     @Override
-    public List<Tweet> findAll() throws SQLException {
+    public List<Tweet> findAll() {
         return tweetRepository.findAll();
     }
 
     @Override
-    public Tweet postTweet(User user, String text, int retweetFromId) throws SQLException {
+    public Tweet postTweet(User user, String text, int retweetFromId) {
         Tweet retweetFrom = findById(retweetFromId);
         Tweet tweet = new Tweet(0, text, 0, 0, user, retweetFrom);
         return save(tweet);
     }
 
     @Override
-    public void viewMyTweets(User user) throws SQLException {
+    public void viewMyTweets(User user) {
         List<Tweet> tweets = findByUser(user);
         if (tweets.isEmpty())
             throw new TweetListIsEmptyException();
@@ -77,7 +77,7 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public void deleteTweet(User user, int tweetId) throws SQLException {
+    public void deleteTweet(User user, int tweetId) {
         doesUserOwnTweet(user, tweetId);
         List<Tag> tags = tweetTagService.findTagsForTweet(tweetId);
         for (Tag tag : tags)
@@ -91,7 +91,7 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public void editTweet(User user, int tweetId, String newText) throws SQLException {
+    public void editTweet(User user, int tweetId, String newText) {
         Tweet tweet;
         try {
             tweet = doesUserOwnTweet(user, tweetId);
@@ -103,27 +103,27 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public void viewAllTweets() throws SQLException {
+    public void viewAllTweets() {
         List<Tweet> tweets = findAll();
         showTweetList(tweets);
     }
 
     @Override
-    public void likeTweet(int tweetId) throws SQLException {
+    public void likeTweet(int tweetId) {
         Tweet tweet = tweetRepository.findById(tweetId);
         tweet.setLikes(tweet.getLikes() + 1);
         tweetRepository.update(tweet);
     }
 
     @Override
-    public void dislikeTweet(int tweetId) throws SQLException {
+    public void dislikeTweet(int tweetId) {
         Tweet tweet = tweetRepository.findById(tweetId);
         tweet.setDislikes(tweet.getDislikes() + 1);
         tweetRepository.update(tweet);
     }
 
     @Override
-    public Tweet doesUserOwnTweet(User user, int tweetId) throws SQLException {
+    public Tweet doesUserOwnTweet(User user, int tweetId) {
         List<Tweet> tweets = findByUser(user);
         Tweet tweet = findById(tweetId);
         if (!tweets.contains(tweet))

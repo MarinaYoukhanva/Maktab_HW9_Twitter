@@ -29,22 +29,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User save(User user) throws SQLException {
+    public User save(User user)  {
         return userRepository.save(user);
     }
 
     @Override
-    public User update(User user) throws SQLException {
+    public User update(User user)  {
         return userRepository.update(user);
     }
 
     @Override
-    public void deleteById(int id) throws SQLException {
+    public void deleteById(int id)  {
         userRepository.deleteById(id);
     }
 
     @Override
-    public User findById(int id) throws SQLException {
+    public User findById(int id)  {
         return userRepository.findById(id);
     }
 
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User signup(String displayName, String email,
-                       String username, String password, String bio) throws SQLException {
+                       String username, String password, String bio){
         User user = findByUsername(username);
         if (user != null)
             throw new TakenUsernameException();
@@ -101,19 +101,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateDisplayName(User user, String displayName) throws SQLException {
+    public User updateDisplayName(User user, String displayName) {
         user.setDisplayName(displayName);
         return update(user);
     }
 
     @Override
-    public User updateBio(User user, String bio) throws SQLException {
+    public User updateBio(User user, String bio)  {
         user.setDisplayName(bio);
         return update(user);
     }
 
     @Override
-    public User updateEmail(User user, String email) throws SQLException {
+    public User updateEmail(User user, String email)  {
         User doesExist = findByEmail(email);
         if (doesExist != null)
             throw new TakenEmailException();
@@ -122,7 +122,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUsername(User user, String username) throws SQLException {
+    public User updateUsername(User user, String username)  {
         User doesExist = findByUsername(username);
         if (doesExist != null)
             throw new TakenUsernameException();
@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updatePassword(User user, String oldPass, String newPass) throws SQLException {
+    public User updatePassword(User user, String oldPass, String newPass)  {
         if (!hashPassword(oldPass).equals(user.getPassword()))
             throw new IncorrectPasswordException();
         user.setPassword(hashPassword(newPass));

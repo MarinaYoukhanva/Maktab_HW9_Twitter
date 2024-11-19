@@ -66,7 +66,7 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public Tag save(Tag tag) throws SQLException {
+    public Tag save(Tag tag) {
         try (var statement = Datasource.getConnection().prepareStatement(INSERT_SQL,
                 PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, tag.getTitle());
@@ -77,47 +77,57 @@ public class TagRepositoryImpl implements TagRepository {
                     tag.setId(generatedKeys.getInt(1));
                 return tag;
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Tag update(Tag tag) throws SQLException {
+    public Tag update(Tag tag) {
         try (var statement = Datasource.getConnection().prepareStatement(UPDATE_SQL)) {
             statement.setString(1, tag.getTitle());
             statement.setInt(2, tag.getId());
             statement.execute();
             return tag;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void deleteById(int id) throws SQLException {
+    public void deleteById(int id) {
         try (var statement = Datasource.getConnection().prepareStatement(DELETE_BY_ID_SQL)) {
             statement.setInt(1, id);
             var affectedRows = statement.executeUpdate();
             System.out.println("number of tags deleted: " + affectedRows);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Tag findById(int id) throws SQLException {
+    public Tag findById(int id) {
         try (var statement = Datasource.getConnection().prepareStatement(FIND_BY_ID_SQL)) {
             statement.setInt(1, id);
             return getTagInfo(statement);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Tag findByTitle(String title) throws SQLException {
+    public Tag findByTitle(String title) {
         try (var statement = Datasource.getConnection().prepareStatement(FIND_BY_TITLE_SQL)) {
             statement.setString(1, title);
             return getTagInfo(statement);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
 
     @Override
-    public List<Tag> findAll() throws SQLException {
+    public List<Tag> findAll() {
         try (var statement = Datasource.getConnection().prepareStatement(SHOW_ALL_TAGS_SQL)) {
             ResultSet resultSet = statement.executeQuery();
             List<Tag> tags = new ArrayList<>();
@@ -127,6 +137,8 @@ public class TagRepositoryImpl implements TagRepository {
                 tags.add(new Tag(tagId, title));
             }
             return tags;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 

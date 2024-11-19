@@ -69,7 +69,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User save(User user) throws SQLException {
+    public User save(User user) {
         try (var statement = Datasource.getConnection().prepareStatement(INSERT_SQL,
                 PreparedStatement.RETURN_GENERATED_KEYS)) {
             setUserInfo(user, statement);
@@ -80,30 +80,36 @@ public class UserRepositoryImpl implements UserRepository {
                     user.setId(generatedKeys.getInt(1));
                 return user;
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public User update(User user) throws SQLException {
+    public User update(User user) {
         try (var statement = Datasource.getConnection().prepareStatement(UPDATE_SQL)) {
             setUserInfo(user, statement);
             statement.setInt(6, user.getId());
             statement.execute();
             return user;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void deleteById(int id) throws SQLException {
+    public void deleteById(int id)  {
         try (var statement = Datasource.getConnection().prepareStatement(DELETE_BY_ID_SQL)) {
             statement.setInt(1, id);
             var affectedRows = statement.executeUpdate();
             System.out.println("number of users deleted: " + affectedRows);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public User findById(int id) throws SQLException {
+    public User findById(int id)  {
         try (var statement = Datasource.getConnection().prepareStatement(FIND_BY_ID_SQL)) {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -112,6 +118,8 @@ public class UserRepositoryImpl implements UserRepository {
                 user = getUserInfo(resultSet);
             }
             return user;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 

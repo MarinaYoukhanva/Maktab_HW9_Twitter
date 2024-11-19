@@ -9,16 +9,12 @@ import java.util.List;
 public interface TweetRepository {
 
     void initTable() throws SQLException;
-    Tweet save(Tweet tweet) throws SQLException;
-    Tweet update(Tweet tweet) throws SQLException;
-
-    Tweet removeParent(Tweet tweet) throws SQLException;
-
-    void deleteById(int id) throws SQLException;
-    Tweet findById(int id) throws SQLException;
-    List<Tweet> findByUser(User user) throws SQLException;
-
-    List<Tweet> findRetweets(int parentId) throws SQLException;
-
-    List<Tweet> findAll() throws SQLException;
+    Tweet save(Tweet tweet);
+    Tweet update(Tweet tweet);
+    Tweet removeParent(Tweet tweet);
+    void deleteById(int id);
+    Tweet findById(int id);
+    List<Tweet> findByUser(User user);
+    List<Tweet> findRetweets(int parentId);
+    List<Tweet> findAll();
 }

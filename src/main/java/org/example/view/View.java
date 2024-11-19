@@ -87,7 +87,7 @@ public class View {
             user = userService.loginWithEmail(loginEmail, loginPassword);
             System.out.println("Login was successful ");
             System.out.println("Welcome dear " + user.getDisplayName());
-        } catch (UserNotFoundException | IncorrectPasswordException | IncorrectEmailFormat e) {
+        } catch (RuntimeException e) {
             System.out.println(e.getMessage());
             tryToLoginWithEmailMenu();
         }
@@ -102,7 +102,7 @@ public class View {
             user = userService.loginWithUsername(loginUsername, loginPassword);
             System.out.println("Login was successful ");
             System.out.println("Welcome dear " + user.getDisplayName());
-        } catch (UserNotFoundException | IncorrectPasswordException e) {
+        } catch (RuntimeException e) {
             System.out.println(e.getMessage());
             tryToLoginWithUsernameMenu();
         }
@@ -147,13 +147,9 @@ public class View {
                         System.out.println("Which tweet would you like to delete? ");
                         tweetId = sc.nextInt();
                         try {
-                            try {
-                                tweetService.deleteTweet(user, tweetId);
-                                System.out.println("Deleting tweet was successful ");
-                            } catch (RuntimeException e) {
-                                System.out.println(e.getMessage());
-                            }
-                        } catch (UserDoesNotOwnTweetException e) {
+                            tweetService.deleteTweet(user, tweetId);
+                            System.out.println("Deleting tweet was successful ");
+                        } catch (RuntimeException e) {
                             System.out.println(e.getMessage());
                         }
                         break;
@@ -170,7 +166,7 @@ public class View {
                                 try {
                                     tweetService.editTweet(user, tweetId, text);
                                     System.out.println("Editing tweet was successful ");
-                                } catch (UserDoesNotOwnTweetException e) {
+                                } catch (RuntimeException e) {
                                     System.out.println(e.getMessage());
                                 }
                                 break;
@@ -255,7 +251,7 @@ public class View {
                         try {
                             userService.updateEmail(user, email);
                             System.out.println("Email updated");
-                        }catch (RuntimeException e) {
+                        } catch (RuntimeException e) {
                             System.out.println(e.getMessage());
                         }
                         break;
@@ -265,7 +261,7 @@ public class View {
                         try {
                             userService.updateUsername(user, username);
                             System.out.println("Username updated");
-                        }catch (RuntimeException e) {
+                        } catch (RuntimeException e) {
                             System.out.println(e.getMessage());
                         }
                         break;
@@ -277,7 +273,7 @@ public class View {
                         try {
                             userService.updatePassword(user, oldPassword, newPassword);
                             System.out.println("Password updated");
-                        }catch (RuntimeException e) {
+                        } catch (RuntimeException e) {
                             System.out.println(e.getMessage());
                         }
                         break;

@@ -28,38 +28,38 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Tag save(Tag tag) throws SQLException {
+    public Tag save(Tag tag){
         return tagRepository.save(tag);
     }
 
     @Override
-    public Tag update(Tag tag) throws SQLException {
+    public Tag update(Tag tag){
         return tagRepository.update(tag);
     }
 
     @Override
-    public void deleteById(int id) throws SQLException {
+    public void deleteById(int id){
         tagRepository.deleteById(id);
     }
 
     @Override
-    public Tag findById(int id) throws SQLException {
+    public Tag findById(int id){
         return tagRepository.findById(id);
     }
 
     @Override
-    public Tag findByTitle(String title) throws SQLException {
+    public Tag findByTitle(String title){
         return tagRepository.findByTitle(title);
     }
 
 
     @Override
-    public List<Tag> findAll() throws SQLException {
+    public List<Tag> findAll(){
         return tagRepository.findAll();
     }
 
     @Override
-    public void chooseTag(User user, int tweetId, int tagId) throws SQLException {
+    public void chooseTag(User user, int tweetId, int tagId){
         Tweet tweet = tweetService.doesUserOwnTweet(user, tweetId);
         Tag tag = findById(tagId);
         if (tag == null)
@@ -72,7 +72,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void deleteTagForTweet(User user, int tweetId, String title) throws SQLException {
+    public void deleteTagForTweet(User user, int tweetId, String title){
         Tweet tweet = tweetService.doesUserOwnTweet(user, tweetId);
         Tag tag = findByTitle(title);
         if (tag == null)
@@ -85,14 +85,14 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Tag createTag(String title) throws SQLException {
+    public Tag createTag(String title){
         if (findByTitle(title) != null)
             throw new TagExistsException();
         Tag tag = new Tag(0, title);
         return save(tag);
     }
 
-    private boolean hasTweetTheTag(int tweetId, int tagId) throws SQLException {
+    private boolean hasTweetTheTag(int tweetId, int tagId) {
         List<Tag> tags = tweetTagService.findTagsForTweet(tweetId);
         Tag tag = findById(tagId);
         return tags.contains(tag);

@@ -51,26 +51,30 @@ public class TweetTagRepositoryImpl implements TweetTagRepository {
     }
 
     @Override
-    public void save(Tweet tweet, Tag tag) throws SQLException {
+    public void save(Tweet tweet, Tag tag) {
         try (var statement = Datasource.getConnection().prepareStatement(INSERT_SQL)) {
             statement.setInt(1, tweet.getId());
             statement.setInt(2, tag.getId());
             statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
 
     @Override
-    public void deleteById(int tweetId, int tagId) throws SQLException {
+    public void deleteById(int tweetId, int tagId) {
         try (var statement = Datasource.getConnection().prepareStatement(DELETE_BY_ID_SQL)) {
             statement.setInt(1, tweetId);
             statement.setInt(2, tagId);
             var affectedRows = statement.executeUpdate();
-            System.out.println("number of tags deleted for tweet : " + affectedRows);        }
+            System.out.println("number of tags deleted for tweet : " + affectedRows);        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public List<Tag> findTagsForTweet(int tweetId) throws SQLException {
+    public List<Tag> findTagsForTweet(int tweetId) {
         try (var statement = Datasource.getConnection().prepareStatement(FIND_TAGS_FOR_TWEET_SQL)){
             statement.setInt(1, tweetId);
             ResultSet resultSet = statement.executeQuery();
@@ -82,6 +86,8 @@ public class TweetTagRepositoryImpl implements TweetTagRepository {
                 tagsList.add(tag);
             }
             return tagsList;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

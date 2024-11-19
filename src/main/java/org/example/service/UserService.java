@@ -7,26 +7,22 @@ import java.sql.SQLException;
 
 public interface UserService {
 
-    User save(User user) throws SQLException;
-    User update(User user) throws SQLException;
-    void deleteById(int id) throws SQLException;
-    User findById(int id) throws SQLException;
+    User save(User user);
+    User update(User user);
+    void deleteById(int id) ;
+    User findById(int id) ;
     User findByUsername(String username);
-    User findByEmail(String email) throws SQLException;
+    User findByEmail(String email) ;
 
     User signup(String displayName, String email,
-                       String username, String password, String bio) throws SQLException;
+                       String username, String password, String bio) ;
     User loginWithEmail (String email, String password);
     User loginWithUsername (String username, String password);
 
 
-    User updateDisplayName(User user, String displayName) throws SQLException;
-
-    User updateBio(User user, String bio) throws SQLException;
-
-    User updateEmail(User user, String email) throws SQLException;
-
-    User updateUsername(User user, String username) throws SQLException;
-
-    User updatePassword(User user, String oldPass, String newPass) throws SQLException;
+    User updateDisplayName(User user, String displayName) ;
+    User updateBio(User user, String bio) ;
+    User updateEmail(User user, String email) ;
+    User updateUsername(User user, String username) ;
+    User updatePassword(User user, String oldPass, String newPass) ;
 }

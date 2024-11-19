@@ -17,17 +17,17 @@ public class TweetTagServiceImpl implements TweetTagService {
     }
 
     @Override
-    public void save(Tweet tweet, Tag tag) throws SQLException {
+    public void save(Tweet tweet, Tag tag){
         tweetTagRepository.save(tweet, tag);
     }
 
     @Override
-    public void deleteById(int tweetId, int tagId) throws SQLException {
+    public void deleteById(int tweetId, int tagId)  {
         tweetTagRepository.deleteById(tweetId, tagId);
     }
 
     @Override
-    public List<Tag> findTagsForTweet(int tweetId) throws SQLException {
+    public List<Tag> findTagsForTweet(int tweetId) {
         return tweetTagRepository.findTagsForTweet(tweetId);
     }
 }

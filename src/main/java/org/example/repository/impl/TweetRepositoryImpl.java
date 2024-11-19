@@ -85,7 +85,7 @@ public class TweetRepositoryImpl implements TweetRepository {
     }
 
     @Override
-    public Tweet save(Tweet tweet) throws SQLException {
+    public Tweet save(Tweet tweet) {
         try (var statement = Datasource.getConnection().prepareStatement(INSERT_SQL,
                 PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, tweet.getText());
@@ -100,11 +100,13 @@ public class TweetRepositoryImpl implements TweetRepository {
                     tweet.setId(generatedKeys.getInt(1));
                 return tweet;
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Tweet update(Tweet tweet) throws SQLException {
+    public Tweet update(Tweet tweet)  {
         try (var statement = Datasource.getConnection().prepareStatement(UPDATE_SQL)) {
             statement.setString(1, tweet.getText());
             statement.setInt(2, tweet.getLikes());
@@ -112,28 +114,34 @@ public class TweetRepositoryImpl implements TweetRepository {
             statement.setInt(4, tweet.getId());
             statement.execute();
             return tweet;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
     @Override
-    public Tweet removeParent(Tweet tweet) throws SQLException {
+    public Tweet removeParent(Tweet tweet) {
         try (var statement = Datasource.getConnection().prepareStatement(UPDATE_PARENT_TO_NULL)) {
             statement.setInt(1, tweet.getId());
             statement.execute();
             return tweet;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void deleteById(int id) throws SQLException {
+    public void deleteById(int id) {
         try (var statement = Datasource.getConnection().prepareStatement(DELETE_BY_ID_SQL)) {
             statement.setInt(1, id);
             var affectedRows = statement.executeUpdate();
             System.out.println("number of tweets deleted: " + affectedRows);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Tweet findById(int id) throws SQLException {
+    public Tweet findById(int id)  {
         try (var statement = Datasource.getConnection().prepareStatement(FIND_BY_ID_SQL)) {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -142,11 +150,13 @@ public class TweetRepositoryImpl implements TweetRepository {
                 tweet = getTweetInfo(resultSet);
             }
             return tweet;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public List<Tweet> findByUser(User user) throws SQLException {
+    public List<Tweet> findByUser(User user) {
         try (var statement = Datasource.getConnection().prepareStatement(FIND_BY_USER_SQL)) {
             statement.setInt(1, user.getId());
             ResultSet resultSet = statement.executeQuery();
@@ -156,10 +166,12 @@ public class TweetRepositoryImpl implements TweetRepository {
                 tweets.add(tweet);
             }
             return tweets;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
     @Override
-    public List<Tweet> findRetweets(int parentId) throws SQLException {
+    public List<Tweet> findRetweets(int parentId)  {
         try (var statement = Datasource.getConnection().prepareStatement(FIND_RETWEETS_SQL)) {
             statement.setInt(1, parentId);
             ResultSet resultSet = statement.executeQuery();
@@ -169,11 +181,13 @@ public class TweetRepositoryImpl implements TweetRepository {
                 tweets.add(tweet);
             }
             return tweets;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public List<Tweet> findAll() throws SQLException {
+    public List<Tweet> findAll()  {
         try (var statement = Datasource.getConnection().prepareStatement(SHOW_TWEETS_SQL)) {
             ResultSet resultSet = statement.executeQuery();
             List<Tweet> tweets = new ArrayList<>();
@@ -182,6 +196,8 @@ public class TweetRepositoryImpl implements TweetRepository {
                 tweets.add(tweet);
             }
             return tweets;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 

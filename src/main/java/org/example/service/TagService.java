@@ -8,15 +8,14 @@ import java.util.List;
 
 public interface TagService{
 
-    Tag save(Tag tag) throws SQLException;
-    Tag update(Tag tag) throws SQLException;
-    void deleteById(int id) throws SQLException;
-    Tag findById(int id) throws SQLException;
-    Tag findByTitle(String title) throws SQLException;
-    List<Tag> findAll() throws SQLException;
+    Tag save(Tag tag);
+    Tag update(Tag tag);
+    void deleteById(int id);
+    Tag findById(int id);
+    Tag findByTitle(String title);
+    List<Tag> findAll();
 
-
-    void chooseTag(User user, int tweetId, int TagId) throws SQLException;
-    void deleteTagForTweet(User user, int tweetId, String title) throws SQLException;
-    Tag createTag(String title) throws SQLException;
+    void chooseTag(User user, int tweetId, int TagId);
+    void deleteTagForTweet(User user, int tweetId, String title);
+    Tag createTag(String title);
 }

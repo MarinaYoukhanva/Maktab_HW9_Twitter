@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface TweetTagService {
 
-    void save(Tweet tweet, Tag tag) throws SQLException;
-    void deleteById(int tweetId, int tagId) throws SQLException;
-    List<Tag> findTagsForTweet(int tweetId) throws SQLException;
+    void save(Tweet tweet, Tag tag);
+    void deleteById(int tweetId, int tagId);
+    List<Tag> findTagsForTweet(int tweetId);
 }
