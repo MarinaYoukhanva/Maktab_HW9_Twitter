@@ -20,5 +20,13 @@ public interface UserService {
     User loginWithUsername (String username, String password);
 
 
+    User updateDisplayName(User user, String displayName) throws SQLException;
 
+    User updateBio(User user, String bio) throws SQLException;
+
+    User updateEmail(User user, String email) throws SQLException;
+
+    User updateUsername(User user, String username) throws SQLException;
+
+    User updatePassword(User user, String oldPass, String newPass) throws SQLException;
 }

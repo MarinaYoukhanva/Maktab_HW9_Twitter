@@ -192,7 +192,8 @@ public class View {
                                         try {
                                             tagService.deleteTagForTweet(user, tweetId, tagTitle);
                                         } catch (RuntimeException e) {
-                                            System.out.println(e.getMessage());;
+                                            System.out.println(e.getMessage());
+                                            ;
                                         }
                                         break;
                                 }
@@ -235,6 +236,58 @@ public class View {
                 }
                 break;
             case 4:
+                System.out.println("1.display name ");
+                System.out.println("2.email address ");
+                System.out.println("3.username ");
+                System.out.println("4.password ");
+                System.out.println("5.bio ");
+                int editChoice = sc.nextInt();
+                switch (editChoice) {
+                    case 1:
+                        System.out.println("Enter your new display name: ");
+                        String displayName = sc.next();
+                        userService.updateDisplayName(user, displayName);
+                        System.out.println("Display name updated");
+                        break;
+                    case 2:
+                        System.out.println("Enter your new email address: ");
+                        String email = sc.next();
+                        try {
+                            userService.updateEmail(user, email);
+                            System.out.println("Email updated");
+                        }catch (RuntimeException e) {
+                            System.out.println(e.getMessage());
+                        }
+                        break;
+                    case 3:
+                        System.out.println("Enter your new username: ");
+                        String username = sc.next();
+                        try {
+                            userService.updateUsername(user, username);
+                            System.out.println("Username updated");
+                        }catch (RuntimeException e) {
+                            System.out.println(e.getMessage());
+                        }
+                        break;
+                    case 4:
+                        System.out.println("Enter your old password: ");
+                        String oldPassword = sc.next();
+                        System.out.println("Enter your new password: ");
+                        String newPassword = sc.next();
+                        try {
+                            userService.updatePassword(user, oldPassword, newPassword);
+                            System.out.println("Password updated");
+                        }catch (RuntimeException e) {
+                            System.out.println(e.getMessage());
+                        }
+                        break;
+                    case 5:
+                        System.out.println("Enter your new bio: ");
+                        String bio = sc.next();
+                        userService.updateBio(user, bio);
+                        System.out.println("Bio updated");
+                        break;
+                }
                 break;
             case 5:
                 Authentication.logout();
@@ -254,7 +307,8 @@ public class View {
                 try {
                     tagService.chooseTag(user, tweetId, tagId);
                 } catch (TagDoesNotExistException | TweetHasThisTagException e) {
-                    System.out.println(e.getMessage());;
+                    System.out.println(e.getMessage());
+                    ;
                 }
                 break;
             case 2:
@@ -265,7 +319,8 @@ public class View {
                     tag = tagService.createTag(tagTitle);
                     tagService.chooseTag(user, tweetId, tag.getId());
                 } catch (TweetHasThisTagException | TagExistsException e) {
-                    System.out.println(e.getMessage());;
+                    System.out.println(e.getMessage());
+                    ;
                 }
                 break;
         }

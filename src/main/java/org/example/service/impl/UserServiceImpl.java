@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.List;
 
 public class UserServiceImpl implements UserService {
 
@@ -99,6 +98,44 @@ public class UserServiceImpl implements UserService {
         }
         Authentication.setLoggedUser(user);
         return user;
+    }
+
+    @Override
+    public User updateDisplayName(User user, String displayName) throws SQLException {
+        user.setDisplayName(displayName);
+        return update(user);
+    }
+
+    @Override
+    public User updateBio(User user, String bio) throws SQLException {
+        user.setDisplayName(bio);
+        return update(user);
+    }
+
+    @Override
+    public User updateEmail(User user, String email) throws SQLException {
+        User doesExist = findByEmail(email);
+        if (doesExist != null)
+            throw new TakenEmailException();
+        user.setEmail(email);
+        return update(user);
+    }
+
+    @Override
+    public User updateUsername(User user, String username) throws SQLException {
+        User doesExist = findByUsername(username);
+        if (doesExist != null)
+            throw new TakenUsernameException();
+        user.setUsername(username);
+        return update(user);
+    }
+
+    @Override
+    public User updatePassword(User user, String oldPass, String newPass) throws SQLException {
+        if (!hashPassword(oldPass).equals(user.getPassword()))
+            throw new IncorrectPasswordException();
+        user.setPassword(hashPassword(newPass));
+        return update(user);
     }
 
     private String hashPassword(String password) {
