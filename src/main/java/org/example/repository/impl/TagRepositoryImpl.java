@@ -2,6 +2,7 @@ package org.example.repository.impl;
 
 import org.example.Datasource;
 import org.example.entity.Tag;
+import org.example.exception.TagDoesNotExistException;
 import org.example.repository.TagRepository;
 import org.example.repository.TweetTagRepository;
 
@@ -52,6 +53,7 @@ public class TagRepositoryImpl implements TagRepository {
             SELECT * FROM tag
             WHERE title = ?
             """;
+
     private static final String SHOW_ALL_TAGS_SQL = """
             SELECT * FROM tag
             """;
@@ -112,6 +114,8 @@ public class TagRepositoryImpl implements TagRepository {
             return getTagInfo(statement);
         }
     }
+
+
     @Override
     public List<Tag> findAll() throws SQLException {
         try (var statement = Datasource.getConnection().prepareStatement(SHOW_ALL_TAGS_SQL)) {

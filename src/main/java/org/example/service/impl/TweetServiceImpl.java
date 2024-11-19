@@ -1,11 +1,13 @@
 package org.example.service.impl;
 
+import org.example.entity.Tag;
 import org.example.entity.Tweet;
 import org.example.entity.User;
 import org.example.exception.UserDoesNotOwnTweetException;
 import org.example.repository.TweetRepository;
 import org.example.repository.impl.TweetRepositoryImpl;
 import org.example.service.TweetService;
+import org.example.service.TweetTagService;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -13,9 +15,11 @@ import java.util.List;
 public class TweetServiceImpl implements TweetService {
 
     TweetRepository tweetRepository;
+    TweetTagService tweetTagService;
 
     public TweetServiceImpl() throws SQLException {
         tweetRepository = new TweetRepositoryImpl();
+        tweetTagService = new TweetTagServiceImpl();
     }
 
     @Override
@@ -60,6 +64,8 @@ public class TweetServiceImpl implements TweetService {
         List<Tweet> tweets = findByUser(user);
         if (!tweets.isEmpty()) {
             for (Tweet tweet : tweets) {
+                if (tweet.getRetweetFrom() != null)
+                    tweet.setText(tweet.getRetweetFrom().getText() + "'  '" + tweet.getText());
                 System.out.println(tweet);
             }
             return true;
@@ -70,6 +76,9 @@ public class TweetServiceImpl implements TweetService {
     @Override
     public void deleteTweet(User user, int tweetId) throws SQLException {
         doesUserOwnTweet(user, tweetId);
+        List<Tag> tags = tweetTagService.findTagsForTweet(tweetId);
+        for (Tag tag : tags)
+            tweetTagService.deleteById(tweetId, tag.getId());
         deleteById(tweetId);
     }
 
@@ -89,6 +98,8 @@ public class TweetServiceImpl implements TweetService {
     public void viewAllTweets() throws SQLException {
         List<Tweet> tweets = tweetRepository.findAll();
         for (Tweet tweet : tweets) {
+            if (tweet.getRetweetFrom() != null)
+                tweet.setText(tweet.getRetweetFrom().getText() + "'  '" + tweet.getText());
             System.out.println(tweet);
         }
     }

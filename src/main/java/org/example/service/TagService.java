@@ -17,6 +17,6 @@ public interface TagService{
 
 
     void chooseTag(User user, int tweetId, int TagId) throws SQLException;
-    void deleteTagForTweet(User user, int tweetId, int tagId) throws SQLException;
+    void deleteTagForTweet(User user, int tweetId, String title) throws SQLException;
     Tag createTag(String title) throws SQLException;
 }

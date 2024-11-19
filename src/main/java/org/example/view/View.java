@@ -14,7 +14,6 @@ import org.example.service.impl.UserServiceImpl;
 
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.Scanner;
 
 public class View {
@@ -119,31 +118,16 @@ public class View {
         int choiceForTweet;
         int tweetId;
         String text;
+        String tagChoice;
         switch (choice) {
             case 1:
                 System.out.println("Enter your Tweet ");
                 text = sc.next();
                 Tweet tweet = tweetService.postTweet(user, text, 0);
                 System.out.println("Do you need tags? (y/n) ");
-                String tagChoice = sc.next();
+                tagChoice = sc.next();
                 while (tagChoice.equalsIgnoreCase("y")) {
-                    System.out.println(tagService.findAll());
-                    System.out.println("1.chose an existing tag ");
-                    System.out.println("2.create a new tag ");
-                    choiceForTweet = sc.nextInt();
-                    switch (choiceForTweet) {
-                        case 1:
-                            System.out.println("Enter tag id ");
-                            int tagId = sc.nextInt();
-                            tagService.chooseTag(user, tweet.getId(), tagId);
-                            break;
-                        case 2:
-                            System.out.println("Enter tag title: ");
-                            String tagTitle = sc.next();
-                            Tag tag = tagService.createTag(tagTitle);
-                            tagService.chooseTag(user, tweet.getId(), tag.getId());
-                            break;
-                    }
+                    tagMenu(tweet.getId());
                     System.out.println("Do you need tags? (y/n) ");
                     tagChoice = sc.next();
                 }
@@ -183,9 +167,28 @@ public class View {
                                 }
                                 break;
                             case 2:
-                                break;
+                                System.out.println("1.add tag ");
+                                System.out.println("2.remove tag ");
+                                int choice2 = sc.nextInt();
+                                switch (choice2) {
+                                    case 1:
+                                        do {
+                                            tagMenu(tweetId);
+                                            System.out.println("Do you need tags? (y/n) ");
+                                            tagChoice = sc.next();
+                                        } while (tagChoice.equalsIgnoreCase("y"));
+                                        break;
+                                    case 2:
+                                        System.out.println("which tag would you like to remove? ");
+                                        String tagTitle = sc.next();
+                                        try {
+                                            tagService.deleteTagForTweet(user, tweetId, tagTitle);
+                                        } catch (RuntimeException e) {
+                                            System.out.println(e.getMessage());;
+                                        }
+                                        break;
+                                }
                         }
-
                         break;
                     case 3:
                         loggedInMenu();
@@ -227,6 +230,35 @@ public class View {
                 break;
             case 5:
                 Authentication.logout();
+                break;
+        }
+    }
+
+    private void tagMenu(int tweetId) throws SQLException {
+        System.out.println(tagService.findAll());
+        System.out.println("1.chose an existing tag ");
+        System.out.println("2.create a new tag ");
+        int choiceForTweet = sc.nextInt();
+        switch (choiceForTweet) {
+            case 1:
+                System.out.println("Enter tag id ");
+                int tagId = sc.nextInt();
+                try {
+                    tagService.chooseTag(user, tweetId, tagId);
+                } catch (TagDoesNotExistException | TweetHasThisTagException e) {
+                    System.out.println(e.getMessage());;
+                }
+                break;
+            case 2:
+                System.out.println("Enter tag title: ");
+                String tagTitle = sc.next();
+                Tag tag;
+                try {
+                    tag = tagService.createTag(tagTitle);
+                    tagService.chooseTag(user, tweetId, tag.getId());
+                } catch (TweetHasThisTagException | TagExistsException e) {
+                    System.out.println(e.getMessage());;
+                }
                 break;
         }
     }
